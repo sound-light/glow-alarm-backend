@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/locations", response_model=LocationResponse)
 def create_locaiton(location: LocationCreate, db: Session = Depends(get_db)):
     try:
-        created_location = crud_location.insert(db=db, id=location.id, location_code=location.location_code, location_name=location.location_name)
+        created_location = crud_location.insert(db=db, location_code=location.location_code, location_name=location.location_name)
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Location creation failed: {str(e)}")
 

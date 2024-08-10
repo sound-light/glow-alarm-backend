@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/user", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        created_user = crud_user.insert(db=db, user_name=user.user_name, google_id=user.google_id, guardian_contact=user.guardian_contact, bulb_ip=user.bulb_ip)
+        created_user = crud_user.insert(db=db, user_name=user.user_name, google_id=user.google_id, guardian_contact=user.guardian_contact, bulb_ip=user.bulb_ip, location_id=user.location_id)
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"User creation failed: {str(e)}")
 
@@ -33,6 +33,17 @@ def read_user(id: str = Path(..., min_length=1), db: Session = Depends(get_db)):
 def read_users(db: Session = Depends(get_db)):
     users = crud_user.get_all(db)
     return JSONResponse(status_code=200, content=jsonable_encoder(users))
+
+@router.get("/user/google/{google_id}", response_model=UserResponse)
+def read_user_by_google_id(google_id: str = Path(..., min_length=1), db: Session = Depends(get_db)):
+    try:
+        user = crud_user.get_by_google_id(db, google_id)
+    except:
+        raise HTTPException(status_code=422, detail="Validation error")
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return JSONResponse(status_code=200, content=jsonable_encoder(user))
+
 
 @router.put("/user/{id}", response_model=UserResponse)
 def update_user(id: str = Path(..., min_length=1), db: Session = Depends(get_db),

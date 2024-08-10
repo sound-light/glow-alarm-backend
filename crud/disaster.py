@@ -2,11 +2,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.disaster import Disaster
 from datetime import datetime
-
+import uuid
 
 class CRUDDisaster:
     @staticmethod
-    def insert(db: Session, *, id: str, disaster_time: datetime, disaster_level: str, disaster_message: str, location_id: str):
+    def insert(db: Session, *, id: str, disaster_time: datetime, disaster_level: str, disaster_message: str, location_id: int):
         disaster = Disaster(id=id, disaster_time=disaster_time, disaster_level=disaster_level, disaster_message=disaster_message, location_id=location_id)
         try:
             db.add(disaster)
@@ -30,7 +30,7 @@ class CRUDDisaster:
         return db.query(Disaster).filter(Disaster.location_id == location_id).all()
 
     @staticmethod
-    def update(db: Session, *, id: str, disaster_time: datetime, disaster_level: str, disaster_message: str, location_id: str):
+    def update(db: Session, *, id: str, disaster_time: datetime, disaster_level: str, disaster_message: str, location_id: int):
         updated_disaster = db.get(Disaster, id)
         if updated_disaster:
             updated_at = datetime.now()

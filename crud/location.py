@@ -2,11 +2,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select, update, delete
 from models.location import Location
+import uuid
 
 class CRUDLocation:
     @staticmethod
-    def insert(db: Session, *, id: str, location_code: int, location_name: str):
-        location = Location(id=id, location_code=location_code, location_name=location_name)
+    def insert(db: Session, *, location_code: str, location_name: str):
+        location = Location(location_code=location_code, location_name=location_name)
         try:
             db.add(location)
             db.commit()

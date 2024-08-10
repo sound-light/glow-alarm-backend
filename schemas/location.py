@@ -4,7 +4,6 @@ from datetime import datetime
 
 class LocationBase(BaseModel):
     
-    id: str
     location_code: str
     location_name: str
 

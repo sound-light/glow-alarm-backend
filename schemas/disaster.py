@@ -3,8 +3,6 @@ from typing import Optional, List
 from datetime import datetime
 
 class DisasterBase(BaseModel):
-
-    id: str
     disaster_time: datetime
     disaster_level: str
     disaster_message: str

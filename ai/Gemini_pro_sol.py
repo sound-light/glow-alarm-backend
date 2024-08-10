@@ -1,14 +1,20 @@
-import textwrap
+
 
 import google.generativeai as genai
 
+import google.generativeai as genai
+from datetime import datetime, timedelta
+
+
+
+"""
+import textwrap
 from IPython.display import display
 from IPython.display import Markdown
 
 import requests
 import json
 
-"""
 url = "https://www.safetydata.go.kr"
 dataName = "/openApi/행정안전부_긴급재난문자"
 servicekey = "5X3PNT4807F326W8"
@@ -76,3 +82,48 @@ class Gemini_pro:
             print(f"Error occurred: {e}")
             return None
 
+
+
+class SmartAlarm:
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.alarms = {}
+        genai.configure(api_key=self.api_key)
+        self.gemini_model = genai.GenerativeModel("gemini-pro")
+
+    def set_alarm(self, bed_time: str, wake_up_time: str):
+        prompt = f"Based on bedtime {bed_time} and wake up time {wake_up_time}, what's the optimal alarm time? Please respond with just the time in HH:MM format."
+        response = self.gemini_model.generate_content(prompt)
+        optimal_time = response.text.strip()
+        self.store_alarm(optimal_time)
+        return optimal_time
+
+    def store_alarm(self, alarm_time: str):
+        self.alarms[alarm_time] = {
+            "original_time": alarm_time,
+            "current_time": alarm_time,
+            "snoozed": False
+        }
+
+    def snooze_alarm(self, current_time: str, situation: str):
+        if not self.alarms:
+            raise ValueError("No active alarm found")
+        
+        prompt = f"Given the current time is {current_time} and the situation is '{situation}', how many minutes should the alarm be snoozed for? Consider factors like urgency, time of day, and the described situation. Please respond with just a number (in minutes)."
+        response = self.gemini_model.generate_content(prompt)
+        snooze_duration = int(response.text.strip())
+
+        current_time_obj = datetime.strptime(current_time, "%H:%M")
+        closest_alarm = min(self.alarms.keys(), key=lambda x: abs(datetime.strptime(x, "%H:%M") - current_time_obj))
+        
+        new_alarm_time = (current_time_obj + timedelta(minutes=snooze_duration)).strftime("%H:%M")
+        self.alarms[new_alarm_time] = {
+            "original_time": self.alarms[closest_alarm]["original_time"],
+            "current_time": new_alarm_time,
+            "snoozed": True
+        }
+        del self.alarms[closest_alarm]
+        return new_alarm_time, snooze_duration
+
+    def get_alarms(self):
+        return self.alarms

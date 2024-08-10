@@ -1,0 +1,1 @@
+#### HTTP CRUD model을 정의하는 폴더 ####

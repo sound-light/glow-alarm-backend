@@ -5,8 +5,12 @@ __pycache__/
 venv/
 .idea/
 
+.env
+
 # C extensions
 *.so
+
+bin/
 
 # Distribution / packaging
 .Python
@@ -56,6 +60,9 @@ cover/
 # Translations
 *.mo
 *.pot
+
+
+pyvenv.cfg
 
 # Django stuff:
 *.log
